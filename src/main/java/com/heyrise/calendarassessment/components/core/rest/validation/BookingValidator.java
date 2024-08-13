@@ -1,31 +1,36 @@
-package com.heyrise.calendarassessment.components.core.rest;
+package com.heyrise.calendarassessment.components.core.rest.validation;
 
 import com.heyrise.calendarassessment.components.core.database.entity.Booking;
 import com.heyrise.calendarassessment.components.core.database.repository.BookingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Component
+@RequiredArgsConstructor
 public class BookingValidator {
 
     private final BookingRepository bookingRepository;
 
-    @Autowired
-    public BookingValidator(BookingRepository bookingRepository) {
-        this.bookingRepository = bookingRepository;
-    }
-
     public void validateBooking(Booking booking) {
-        // Validation logic for overlapping bookings or other business rules
         if (isOverlapping(booking)) {
             throw new IllegalArgumentException("Booking time overlaps with an existing booking.");
         }
-        // Additional validation logic can be added here
+        if (isOutsideAllowedHours(booking)) {
+            throw new IllegalArgumentException("Booking time must be within the allowed hours (08:00 to 18:00).");
+        }
     }
 
     private boolean isOverlapping(Booking booking) {
-        // Check if the booking overlaps with any existing bookings
         return bookingRepository.existsByDateAndTimeRange(
                 booking.getDate(), booking.getStartTime(), booking.getEndTime());
+    }
+
+    private boolean isOutsideAllowedHours(Booking booking) {
+        LocalDate allowedStart = LocalDate.from(LocalTime.of(8, 0));
+        LocalTime allowedEnd = LocalTime.of(18, 0);
+        return booking.getStartTime().isBefore(LocalTime.from(allowedStart)) || booking.getEndTime().isAfter(allowedEnd);
     }
 }
