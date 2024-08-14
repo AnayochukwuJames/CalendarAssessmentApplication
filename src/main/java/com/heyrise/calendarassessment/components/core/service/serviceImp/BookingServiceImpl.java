@@ -55,7 +55,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public ResponseEntity<Response> updateBooking(Long id, BookingDTO bookingDTO) {
         Booking booking = bookingMapper.toEntity(bookingDTO);
-        booking.setId(id);
         Booking updatedBooking = bookingRepository.save(booking);
         Map<String, Object> map = new HashMap<>();
         map.put("booking", bookingMapper.toDTO(updatedBooking));
