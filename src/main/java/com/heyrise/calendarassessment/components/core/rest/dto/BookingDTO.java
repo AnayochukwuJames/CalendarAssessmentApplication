@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Data
 public class BookingDTO {
 
-//    private Long id;
+   private Long id;
 
     @NotNull(message = "Date cannot be null.")
     @PastOrPresent(message = "Date must be in the present.")
