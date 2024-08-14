@@ -53,9 +53,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public ResponseEntity<Response> updateBooking(Long id, BookingDTO bookingDTO) {
+    public ResponseEntity<Response> updateBooking(Long id, BookingDTO bookingDTO) throws BookingOverlapException {
+        LocalTime startTime = bookingDTO.getStartTime();
+        LocalTime endTime = bookingDTO.getEndTime();
+        if (startTime.isBefore(LocalTime.of(8, 0)) || endTime.isAfter(LocalTime.of(18, 0)) || startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Booking must be within the time range from 08:00 to 18:00 and end time must be after start time.");
+        }
+
+        boolean isOverlapping = bookingRepository.existsByDateAndTimeOverlap(bookingDTO.getDate(), startTime, endTime);
+        if (isOverlapping) {
+            throw new BookingOverlapException("The booking overlaps with an existing booking.");
+        }
+
         Booking booking = bookingMapper.toEntity(bookingDTO);
         Booking updatedBooking = bookingRepository.save(booking);
+
         Map<String, Object> map = new HashMap<>();
         map.put("booking", bookingMapper.toDTO(updatedBooking));
         Response response = new Response(true, "Booking updated successfully", map);
@@ -89,13 +101,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDTO> getAllBookings() {
+    public ResponseEntity<List<BookingDTO>> getAllBookings() {
         List<BookingDTO> bookings = bookingRepository.findAll().stream()
                 .map(bookingMapper::toDTO)
                 .collect(Collectors.toList());
-        Map<String, Object> map = new HashMap<>();
-        map.put("bookings", bookings);
-        Response response = new Response(true, "All bookings retrieved successfully", map);
-        return (List<BookingDTO>) ResponseEntity.ok(response);
+        return ResponseEntity.ok(bookings);
     }
+
 }

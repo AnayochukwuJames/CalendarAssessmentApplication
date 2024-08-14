@@ -1,7 +1,6 @@
 package com.heyrise.calendarassessment.components.restController;
 
 import com.heyrise.calendarassessment.common.exception.DateAlreadyBookedException;
-import com.heyrise.calendarassessment.components.core.database.entity.Booking;
 import com.heyrise.calendarassessment.components.core.rest.dto.BookingDTO;
 import com.heyrise.calendarassessment.components.core.rest.response.Response;
 import com.heyrise.calendarassessment.components.core.service.BookingService;
@@ -40,8 +39,8 @@ public class BookingController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<Booking>> getAllBookings() {
-        return (ResponseEntity<List<Booking>>) bookingService.getAllBookings();
+    public ResponseEntity<List<BookingDTO>> getAllBookings() {
+        return bookingService.getAllBookings();
 
     }
 }
