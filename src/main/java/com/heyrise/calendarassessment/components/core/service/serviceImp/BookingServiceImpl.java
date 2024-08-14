@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
     public ResponseEntity<Response> deleteBooking(Long id) {
         try {
             bookingRepository.deleteById(id);
-            Response response = new Response(true, "Booking deleted successfully", null);
+            Response response = new Response(true, "This Booking has deleted successfully", null);
             return ResponseEntity.ok(response);
         } catch (NoSuchElementException exception) {
             Response response = new Response(false, "Booking not found.", null);
